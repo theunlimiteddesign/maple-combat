@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Force Simulator — MapleCalc</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a14;--card:#12121f;--border:#1e1e35;--orange:#ff6b35;--gold:#ffd166;--cyan:#06d6a0;--red:#ef233c;--blue:#60a5fa;--text:#e8e8f0;--muted:#6b6b8a;--input-bg:#0d0d1a;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;background-image:radial-gradient(ellipse at 70% 30%,rgba(96,165,250,0.06) 0%,transparent 50%);}
+  header{background:linear-gradient(135deg,#0f0f20,#060d1a);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;gap:14px;}
+  .logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--orange);letter-spacing:2px;}
+  .logo span{color:var(--gold);}
+  .badge{background:rgba(96,165,250,0.12);border:1px solid rgba(96,165,250,0.3);color:var(--blue);font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
+  .container{max-width:700px;margin:0 auto;padding:28px 20px;}
+  h1{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:28px;}
+  .section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+  .section-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .field label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .field input,.field select{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s;}
+  .field input:focus,.field select:focus{border-color:var(--blue);}
+  .field select option{background:var(--card);}
+  .toggles{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .toggle{padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+  .toggle.on{border-color:var(--blue);color:var(--blue);background:rgba(96,165,250,0.1);}
+  .btn{width:100%;background:linear-gradient(135deg,var(--blue),#2563eb);border:none;border-radius:10px;color:white;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;padding:14px;cursor:pointer;transition:transform .15s,box-shadow .15s;text-transform:uppercase;}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(96,165,250,0.4);}
+  .star-track{display:flex;flex-wrap:wrap;gap:4px;margin:16px 0;}
+  .star{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1px solid var(--border);color:var(--muted);background:var(--input-bg);font-family:'Rajdhani',sans-serif;}
+  .star.achieved{background:rgba(255,209,102,0.15);border-color:var(--gold);color:var(--gold);}
+  .star.target{background:rgba(96,165,250,0.2);border-color:var(--blue);color:var(--blue);}
+  .star.danger{background:rgba(239,35,60,0.15);border-color:var(--red);color:var(--red);}
+  .result-panel{background:linear-gradient(135deg,#060d1a,#0a0a14);border:1px solid rgba(96,165,250,0.3);border-radius:12px;padding:24px;margin:20px 0;display:none;}
+  .res-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:20px;}
+  .res-val{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;}
+  .res-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+  .cost-val{color:var(--gold);}
+  .destroy-val{color:var(--red);}
+  .attempts-val{color:var(--blue);}
+  .savings-val{color:var(--cyan);}
+  .prob-table{width:100%;border-collapse:collapse;margin-top:12px;}
+  .prob-table th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);}
+  .prob-table td{font-size:13px;padding:7px 10px;border-bottom:1px solid rgba(30,30,53,0.5);font-family:'Rajdhani',sans-serif;}
+  .prob-table tr:last-child td{border-bottom:none;}
+  .pct-bar{display:inline-block;height:4px;border-radius:2px;margin-left:8px;vertical-align:middle;}
+  .note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:6px;border-left:3px solid var(--border);}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Maple<span>Calc</span></div>
+  <div class="badge">Star Force</div>
+</header>
+<div class="container">
+  <h1>⭐ Star Force Cost Simulator</h1>
+  <p class="subtitle">Estimate meso cost, expected attempts, and destruction risk for Star Force enhancement.</p>
+
+  <div class="section">
+    <div class="section-title">Equipment Info</div>
+    <div class="grid">
+      <div class="field"><label>Equipment Level</label>
+        <select id="eqLevel">
+          <option value="130">Lv. 130 (CRA)</option>
+          <option value="140">Lv. 140 (Absolab)</option>
+          <option value="150">Lv. 150 (Arcane)</option>
+          <option value="160" selected>Lv. 160 (Arcane Umbra)</option>
+          <option value="200">Lv. 200 (Genesis/Eternal)</option>
+          <option value="250">Lv. 250 (Dreamy)</option>
+        </select>
+      </div>
+      <div class="field"><label>Current Stars</label>
+        <select id="currentStar">
+          <option value="0">0 ★</option>
+          <option value="5">5 ★</option>
+          <option value="10">10 ★</option>
+          <option value="12">12 ★</option>
+          <option value="15">15 ★</option>
+          <option value="17">17 ★</option>
+          <option value="20">20 ★</option>
+          <option value="22">22 ★</option>
+        </select>
+      </div>
+      <div class="field"><label>Target Stars</label>
+        <select id="targetStar">
+          <option value="5">5 ★</option>
+          <option value="10">10 ★</option>
+          <option value="12">12 ★</option>
+          <option value="15">15 ★</option>
+          <option value="17">17 ★</option>
+          <option value="20" selected>20 ★</option>
+          <option value="22">22 ★</option>
+          <option value="25">25 ★</option>
+        </select>
+      </div>
+      <div class="field"><label>Number of Pieces</label>
+        <input type="number" id="pieces" value="1" min="1" max="17">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Event Buffs</div>
+    <div class="toggles">
+      <div class="toggle" id="t30" onclick="toggle('t30')">30% Off Cost</div>
+      <div class="toggle" id="t51015" onclick="toggle('t51015')">5/10/15 Event (no fail)</div>
+      <div class="toggle" id="tSafeguard" onclick="toggle('tSafeguard')">Safeguard (12–14★)</div>
+      <div class="toggle" id="tMvp" onclick="toggle('tMvp')">MVP 10% Discount</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);">Toggle active event buffs to see cost impact.</div>
+  </div>
+
+  <button class="btn" onclick="simulate()">SIMULATE STAR FORCE COST</button>
+
+  <div class="result-panel" id="resultPanel">
+    <div class="res-grid">
+      <div><div class="res-val cost-val" id="resCost">0</div><div class="res-label">Expected Total Cost</div></div>
+      <div><div class="res-val attempts-val" id="resAttempts">0</div><div class="res-label">Expected Attempts</div></div>
+      <div><div class="res-val destroy-val" id="resDestroys">0</div><div class="res-label">Expected Destructions</div></div>
+      <div><div class="res-val savings-val" id="resSavings">0</div><div class="res-label">Event Savings</div></div>
+    </div>
+
+    <div class="section-title" style="color:var(--blue);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Per-Star Breakdown</div>
+    <table class="prob-table">
+      <thead><tr><th>Star</th><th>Success %</th><th>Fail %</th><th>Destroy %</th><th>Est. Cost</th></tr></thead>
+      <tbody id="starTable"></tbody>
+    </table>
+  </div>
+
+  <div class="note">⚠️ This is a probability-based estimate using Monte Carlo simulation (10,000 runs). Actual results vary due to RNG. Destruction rates become significant above 15★ — consider Safeguard at 12–14★ if budget is limited.</div>
+</div>
+
+<script>
+const activeToggles = {};
+function toggle(id) {
+  activeToggles[id] = !activeToggles[id];
+  document.getElementById(id).classList.toggle('on', activeToggles[id]);
+}
+
+// Star Force rates per star (success%, keep%, fail%, destroy%)
+const SF_RATES = [
+  [95,0,5,0],[90,0,10,0],[85,0,15,0],[85,0,15,0],[80,0,20,0],
+  [75,0,25,0],[70,0,30,0],[65,0,35,0],[60,0,40,0],[55,0,45,0],
+  [50,0,50,0],[45,0,50,5],[40,0,55,5],[35,0,60,5],[30,0,65,5],
+  [30,0,70,0],[30,0,70,0],[30,0,70,0],[30,0,72,2],[30,0,70,0],
+  [30,0,68,2],[30,0,68,2],[3,0,95,2],[2,0,96,2],[1,0,99,0]
+];
+
+// Base costs by level (simplified formula: 100 * level^3 * (current_star + 1))
+function baseCost(level, star) {
+  return Math.round(100 * Math.pow(level, 3) * (star + 1));
+}
+
+function fmtM(n){if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(0)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return Math.round(n).toLocaleString();}
+
+function simulate() {
+  const level = +document.getElementById('eqLevel').value;
+  const start = +document.getElementById('currentStar').value;
+  const target = +document.getElementById('targetStar').value;
+  const pieces = +document.getElementById('pieces').value || 1;
+
+  if (target <= start) { alert('Target must be higher than current stars.'); return; }
+
+  const discount30 = activeToggles['t30'];
+  const event51015 = activeToggles['t51015'];
+  const safeguard = activeToggles['tSafeguard'];
+  const mvp = activeToggles['tMvp'];
+
+  const RUNS = 10000;
+  let totalCost = 0, totalAttempts = 0, totalDestroys = 0;
+  const perStarCosts = Array(25).fill(0), perStarAttempts = Array(25).fill(0);
+
+  for (let run = 0; run < RUNS; run++) {
+    let star = start;
+    let runCost = 0, runAttempts = 0, runDestroys = 0;
+
+    while (star < target) {
+      const rates = [...SF_RATES[star]];
+      let cost = baseCost(level, star);
+
+      // Apply discounts
+      let costMult = 1;
+      if (discount30) costMult *= 0.7;
+      if (mvp) costMult *= 0.9;
+      // Safeguard adds 30% to cost but prevents destruction
+      let destroyRate = rates[3] / 100;
+      if (safeguard && star >= 12 && star <= 14) {
+        costMult *= 1.3;
+        destroyRate = 0;
+      }
+
+      let successRate = rates[0] / 100;
+      let failRate = (100 - rates[0] - rates[3]) / 100;
+      if (safeguard && star >= 12 && star <= 14) {
+        failRate = 1 - successRate;
+        destroyRate = 0;
+      }
+
+      // 5/10/15 event: guaranteed success at those stars
+      if (event51015 && (star === 5 || star === 10 || star === 15)) {
+        successRate = 1; failRate = 0; destroyRate = 0;
+      }
+
+      const roll = Math.random();
+      cost = Math.round(cost * costMult);
+      runCost += cost;
+      runAttempts++;
+      perStarCosts[star] += cost;
+      perStarAttempts[star]++;
+
+      if (roll < successRate) {
+        star++;
+      } else if (roll < successRate + destroyRate) {
+        runDestroys++;
+        totalDestroys++;
+        // destroyed — back to 12 or 0 depending on star
+        star = star >= 17 ? 12 : Math.max(star - 1, 0);
+      } else {
+        // fail/maintain — star stays or drops
+        if (star >= 15) star = Math.max(star - 1, 0);
+      }
+    }
+
+    totalCost += runCost;
+    totalAttempts += runAttempts;
+  }
+
+  const avgCost = Math.round((totalCost / RUNS) * pieces);
+  const avgAttempts = Math.round(totalAttempts / RUNS * pieces);
+  const avgDestroys = (totalDestroys / RUNS * pieces).toFixed(2);
+
+  // Compute savings vs no-event baseline
+  let baseCostTotal = 0;
+  for (let s = start; s < target; s++) {
+    baseCostTotal += baseCost(level, s) * (perStarAttempts[s] / RUNS || 1);
+  }
+  const savings = Math.max(0, Math.round(baseCostTotal * pieces) - avgCost);
+
+  document.getElementById('resCost').textContent = fmtM(avgCost);
+  document.getElementById('resAttempts').textContent = avgAttempts.toLocaleString();
+  document.getElementById('resDestroys').textContent = avgDestroys;
+  document.getElementById('resSavings').textContent = fmtM(savings);
+
+  let tableHtml = '';
+  for (let s = start; s < Math.min(target, 25); s++) {
+    const r = SF_RATES[s];
+    const isD = r[3] > 0;
+    const estCost = fmtM(Math.round(baseCost(level, s) * (activeToggles['t30'] ? 0.7 : 1) * (activeToggles['tMvp'] ? 0.9 : 1)));
+    tableHtml += `
+      <tr>
+        <td style="color:var(--gold);font-weight:700;">${s}★ → ${s+1}★</td>
+        <td>${r[0]}% <div class="pct-bar" style="width:${r[0]*0.6}px;background:var(--cyan)"></div></td>
+        <td>${100-r[0]-r[3]}%</td>
+        <td style="color:${isD?'var(--red)':'var(--muted)'};">${r[3]}%${isD?'⚠':'—'}</td>
+        <td style="color:var(--gold);">${estCost}</td>
+      </tr>
+    `;
+  }
+  document.getElementById('starTable').innerHTML = tableHtml;
+  document.getElementById('resultPanel').style.display = 'block';
+}
+</script>
+</body>
+</html>

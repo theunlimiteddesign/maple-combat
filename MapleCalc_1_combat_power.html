@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Combat Power Estimator — MapleCalc</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a14;
+    --card: #12121f;
+    --border: #1e1e35;
+    --orange: #ff6b35;
+    --gold: #ffd166;
+    --cyan: #06d6a0;
+    --red: #ef233c;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --input-bg: #0d0d1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse at 20% 20%, rgba(255,107,53,0.06) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 80%, rgba(6,214,160,0.04) 0%, transparent 50%);
+  }
+  header {
+    background: linear-gradient(135deg, #0f0f20 0%, #1a0a05 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .logo { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: var(--orange); letter-spacing: 2px; }
+  .logo span { color: var(--gold); }
+  .badge { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); color: var(--orange); font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; }
+  .container { max-width: 700px; margin: 0 auto; padding: 28px 20px; }
+  h1 { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; color: var(--gold); margin-bottom: 6px; letter-spacing: 1px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: var(--orange); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field label {
+    display: block; font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%; background: var(--input-bg);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: 'Exo 2', sans-serif;
+    font-size: 14px; padding: 10px 12px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--orange); }
+  .field select option { background: var(--card); }
+  .result-panel {
+    background: linear-gradient(135deg, #0d1a12 0%, #0a0a14 100%);
+    border: 1px solid rgba(6,214,160,0.3);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin: 20px 0;
+  }
+  .cp-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .cp-value { font-family: 'Rajdhani', sans-serif; font-size: 52px; font-weight: 700; color: var(--cyan); line-height: 1; }
+  .cp-value.legendary { color: var(--gold); }
+  .cp-value.epic { color: #b47fff; }
+  .cp-tier { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .cp-tier strong { color: var(--gold); }
+  .btn {
+    width: 100%; background: linear-gradient(135deg, var(--orange), #ff4500);
+    border: none; border-radius: 10px; color: white;
+    font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700;
+    letter-spacing: 1px; padding: 14px; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    text-transform: uppercase;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,107,53,0.4); }
+  .breakdown { margin-top: 16px; }
+  .breakdown-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .label { color: var(--muted); }
+  .breakdown-row .val { font-weight: 600; color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 15px; }
+  .tier-bar { display: flex; gap: 4px; margin-top: 16px; }
+  .tier-seg { flex: 1; height: 6px; border-radius: 3px; background: var(--border); transition: background 0.4s; }
+  .tier-seg.active-1 { background: #6b6b8a; }
+  .tier-seg.active-2 { background: #4CAF50; }
+  .tier-seg.active-3 { background: #2196F3; }
+  .tier-seg.active-4 { background: #9C27B0; }
+  .tier-seg.active-5 { background: var(--gold); }
+  .tier-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .note { font-size: 11px; color: var(--muted); margin-top: 12px; line-height: 1.6; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; border-left: 3px solid var(--border); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Maple<span>Calc</span></div>
+  <div class="badge">Combat Power</div>
+</header>
+<div class="container">
+  <h1>⚔️ Combat Power Estimator</h1>
+  <p class="subtitle">Estimate your character's Combat Power based on stats, damage modifiers, and gear score.</p>
+
+  <div class="section">
+    <div class="section-title">Core Stats</div>
+    <div class="grid">
+      <div class="field"><label>Main Stat (buffed)</label><input type="number" id="mainStat" placeholder="e.g. 35000" value=""></div>
+      <div class="field"><label>Secondary Stat</label><input type="number" id="secStat" placeholder="e.g. 3000" value=""></div>
+      <div class="field"><label>Attack / Magic ATT</label><input type="number" id="att" placeholder="e.g. 280" value=""></div>
+      <div class="field"><label>Damage % (total)</label><input type="number" id="dmgPct" placeholder="e.g. 120" value=""></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Combat Modifiers</div>
+    <div class="grid">
+      <div class="field"><label>Boss Damage %</label><input type="number" id="bossDmg" placeholder="e.g. 250" value=""></div>
+      <div class="field"><label>Final Damage %</label><input type="number" id="finalDmg" placeholder="e.g. 60" value=""></div>
+      <div class="field"><label>Ignore DEF %</label><input type="number" id="ied" placeholder="e.g. 93" value=""></div>
+      <div class="field"><label>Crit Damage %</label><input type="number" id="critDmg" placeholder="e.g. 70" value=""></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Character Info</div>
+    <div class="grid">
+      <div class="field"><label>Class Type</label>
+        <select id="classType">
+          <option value="1.0">STR Warrior / Pirate</option>
+          <option value="1.0">DEX Bowman / Pirate</option>
+          <option value="1.1">INT Mage</option>
+          <option value="1.0">LUK Thief</option>
+          <option value="0.9">HP Warrior (Demon Avenger)</option>
+        </select>
+      </div>
+      <div class="field"><label>Character Level</label><input type="number" id="charLevel" placeholder="e.g. 270" value=""></div>
+      <div class="field"><label>Arcane / Sacred Force</label><input type="number" id="arcaneForce" placeholder="e.g. 1800" value=""></div>
+      <div class="field"><label>Total Star Force (all gear)</label><input type="number" id="starForce" placeholder="e.g. 300" value=""></div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="calculate()">CALCULATE COMBAT POWER</button>
+
+  <div class="result-panel" id="resultPanel" style="display:none">
+    <div class="cp-label">Estimated Combat Power</div>
+    <div class="cp-value" id="cpValue">0</div>
+    <div class="cp-tier" id="cpTier"></div>
+    <div class="tier-bar" id="tierBar">
+      <div class="tier-seg" id="t1"></div>
+      <div class="tier-seg" id="t2"></div>
+      <div class="tier-seg" id="t3"></div>
+      <div class="tier-seg" id="t4"></div>
+      <div class="tier-seg" id="t5"></div>
+    </div>
+    <div class="tier-labels">
+      <span>Early</span><span>Mid</span><span>Late</span><span>End</span><span>End+</span>
+    </div>
+    <div class="breakdown" id="breakdown"></div>
+  </div>
+
+  <div class="note">
+    ℹ️ Combat Power is an approximation. Actual in-game CP varies by class mechanics, skill rotations, and version. Use this as a directional guide, not an absolute number. For precise calculations, cross-reference with MapleScoutr.
+  </div>
+</div>
+
+<script>
+function fmt(n) { return Math.round(n).toLocaleString(); }
+
+function calculate() {
+  const mainStat = +document.getElementById('mainStat').value || 0;
+  const secStat = +document.getElementById('secStat').value || 0;
+  const att = +document.getElementById('att').value || 0;
+  const dmgPct = +document.getElementById('dmgPct').value || 100;
+  const bossDmg = +document.getElementById('bossDmg').value || 0;
+  const finalDmg = +document.getElementById('finalDmg').value || 0;
+  const ied = +document.getElementById('ied').value || 0;
+  const critDmg = +document.getElementById('critDmg').value || 35;
+  const level = +document.getElementById('charLevel').value || 200;
+  const arcane = +document.getElementById('arcaneForce').value || 0;
+  const stars = +document.getElementById('starForce').value || 0;
+  const classMult = +document.getElementById('classType').value || 1.0;
+
+  if (!mainStat || !att) {
+    alert('Please enter at least Main Stat and Attack/Magic ATT.');
+    return;
+  }
+
+  // Base damage component
+  const statScore = (mainStat * 4 + secStat) / 100;
+  const attScore = att;
+  const baseDmg = statScore * attScore * classMult;
+
+  // Multiplier chain
+  const dmgMult = (1 + dmgPct / 100);
+  const bossMult = (1 + bossDmg / 100);
+  const finalMult = (1 + finalDmg / 100);
+  const iedMult = (1 + ied / 200); // partial weight
+  const critMult = (1 + critDmg / 200); // avg crit contribution
+
+  // Level bonus
+  const levelBonus = 1 + (level - 200) * 0.003;
+
+  // Arcane Force bonus
+  const arcaneBonus = 1 + Math.min(arcane, 2400) * 0.0002;
+
+  // Star Force bonus
+  const starBonus = 1 + stars * 0.0015;
+
+  const totalCP = baseDmg * dmgMult * bossMult * finalMult * iedMult * critMult * levelBonus * arcaneBonus * starBonus;
+
+  // Tier classification
+  let tier, tierClass, tierSegs;
+  if (totalCP < 50000) { tier = "Early Game — Keep grinding!"; tierClass = ""; tierSegs = 1; }
+  else if (totalCP < 200000) { tier = "Mid Game — Making progress 💪"; tierClass = ""; tierSegs = 2; }
+  else if (totalCP < 600000) { tier = "Late Game — Boss ready 🔥"; tierClass = "epic"; tierSegs = 3; }
+  else if (totalCP < 1500000) { tier = "End Game — Top tier 👑"; tierClass = "legendary"; tierSegs = 4; }
+  else { tier = "End Game+ — Absolute unit 🌟"; tierClass = "legendary"; tierSegs = 5; }
+
+  document.getElementById('resultPanel').style.display = 'block';
+  const cpEl = document.getElementById('cpValue');
+  cpEl.textContent = fmt(totalCP);
+  cpEl.className = 'cp-value ' + tierClass;
+  document.getElementById('cpTier').innerHTML = `<strong>${tier}</strong>`;
+
+  for (let i = 1; i <= 5; i++) {
+    const seg = document.getElementById('t' + i);
+    seg.className = 'tier-seg' + (i <= tierSegs ? ` active-${i}` : '');
+  }
+
+  document.getElementById('breakdown').innerHTML = `
+    <div class="breakdown-row"><span class="label">Base Stat × ATT Score</span><span class="val">${fmt(baseDmg)}</span></div>
+    <div class="breakdown-row"><span class="label">Damage % Multiplier</span><span class="val">×${dmgMult.toFixed(2)}</span></div>
+    <div class="breakdown-row"><span class="label">Boss Damage Multiplier</span><span class="val">×${bossMult.toFixed(2)}</span></div>
+    <div class="breakdown-row"><span class="label">Final Damage Multiplier</span><span class="val">×${finalMult.toFixed(2)}</span></div>
+    <div class="breakdown-row"><span class="label">IED Contribution</span><span class="val">×${iedMult.toFixed(2)}</span></div>
+    <div class="breakdown-row"><span class="label">Crit Damage Contribution</span><span class="val">×${critMult.toFixed(2)}</span></div>
+    <div class="breakdown-row"><span class="label">Level Bonus</span><span class="val">×${levelBonus.toFixed(3)}</span></div>
+    <div class="breakdown-row"><span class="label">Arcane/Sacred Force Bonus</span><span class="val">×${arcaneBonus.toFixed(3)}</span></div>
+    <div class="breakdown-row"><span class="label">Star Force Bonus</span><span class="val">×${starBonus.toFixed(3)}</span></div>
+  `;
+}
+</script>
+</body>
+</html>

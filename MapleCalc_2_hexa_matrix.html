@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hexa Matrix Priority — MapleCalc</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a14; --card: #12121f; --border: #1e1e35;
+    --orange: #ff6b35; --gold: #ffd166; --cyan: #06d6a0;
+    --purple: #b47fff; --text: #e8e8f0; --muted: #6b6b8a; --input-bg: #0d0d1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Exo 2', sans-serif; min-height: 100vh;
+    background-image: radial-gradient(ellipse at 30% 10%, rgba(180,127,255,0.06) 0%, transparent 50%); }
+  header { background: linear-gradient(135deg, #0f0f20, #0d0a1a); border-bottom: 1px solid var(--border); padding: 18px 24px; display: flex; align-items: center; gap: 14px; }
+  .logo { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: var(--orange); letter-spacing: 2px; }
+  .logo span { color: var(--gold); }
+  .badge { background: rgba(180,127,255,0.15); border: 1px solid rgba(180,127,255,0.3); color: var(--purple); font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; }
+  .container { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
+  h1 { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .section-title { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600; color: var(--purple); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .field select, .field input { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 14px; padding: 10px 12px; outline: none; transition: border-color 0.2s; }
+  .field select:focus, .field input:focus { border-color: var(--purple); }
+  .field select option { background: var(--card); }
+  .btn { width: 100%; background: linear-gradient(135deg, var(--purple), #7c3aed); border: none; border-radius: 10px; color: white; font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; padding: 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; text-transform: uppercase; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(180,127,255,0.4); }
+  .skill-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; transition: border-color 0.2s; }
+  .skill-card.tier-1 { border-left: 3px solid var(--gold); }
+  .skill-card.tier-2 { border-left: 3px solid var(--cyan); }
+  .skill-card.tier-3 { border-left: 3px solid var(--purple); }
+  .skill-card.tier-4 { border-left: 3px solid var(--orange); }
+  .skill-card.tier-5 { border-left: 3px solid var(--muted); }
+  .rank-badge { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; min-width: 32px; text-align: center; }
+  .tier-1 .rank-badge { color: var(--gold); }
+  .tier-2 .rank-badge { color: var(--cyan); }
+  .tier-3 .rank-badge { color: var(--purple); }
+  .tier-4 .rank-badge { color: var(--orange); }
+  .tier-5 .rank-badge { color: var(--muted); }
+  .skill-info { flex: 1; }
+  .skill-name { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .skill-type { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .skill-type.origin { color: var(--gold); }
+  .skill-type.mastery { color: var(--cyan); }
+  .skill-type.enhance { color: var(--purple); }
+  .skill-type.common { color: var(--muted); }
+  .skill-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .frag-cost { font-family: 'Rajdhani', sans-serif; font-size: 13px; color: var(--orange); text-align: right; white-space: nowrap; }
+  .frag-label { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+  .level-input { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .level-input label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .level-input input { width: 60px; padding: 4px 8px; font-size: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); text-align: center; outline: none; }
+  .summary-bar { background: linear-gradient(135deg, #0d1420, #0a0a14); border: 1px solid rgba(180,127,255,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center; }
+  .sum-val { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; color: var(--purple); }
+  .sum-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  #results { display: none; }
+  .note { font-size: 11px; color: var(--muted); margin-top: 12px; line-height: 1.6; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; border-left: 3px solid var(--border); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Maple<span>Calc</span></div>
+  <div class="badge">Hexa Matrix</div>
+</header>
+<div class="container">
+  <h1>💠 Hexa Matrix Priority Guide</h1>
+  <p class="subtitle">Find the optimal Hexa skill upgrade order for your class role and current fragment supply.</p>
+
+  <div class="section">
+    <div class="section-title">Your Setup</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Class Role</label>
+        <select id="role">
+          <option value="boss">Main Bosser</option>
+          <option value="mob">Mobber / Farmer</option>
+          <option value="support">Support</option>
+          <option value="mule">Boss Mule</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Hexa Fragment Stock</label>
+        <input type="number" id="frags" placeholder="e.g. 5000" value="">
+      </div>
+      <div class="field">
+        <label>Current Origin Skill Level</label>
+        <input type="number" id="originLv" placeholder="0–30" min="0" max="30" value="0">
+      </div>
+      <div class="field">
+        <label>Current Mastery Level (avg)</label>
+        <input type="number" id="masteryLv" placeholder="0–10" min="0" max="10" value="0">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generate()">GENERATE PRIORITY LIST</button>
+
+  <div id="results">
+    <div class="summary-bar">
+      <div><div class="sum-val" id="sumFrags">0</div><div class="sum-label">Frags to Next Goal</div></div>
+      <div><div class="sum-val" id="sumLevels">0</div><div class="sum-label">Skills to Upgrade</div></div>
+      <div><div class="sum-val" id="sumWeeks">0</div><div class="sum-label">Est. Weeks</div></div>
+    </div>
+    <div id="skillList"></div>
+  </div>
+
+  <div class="note">
+    ℹ️ Hexa skill priority is general guidance. Actual priority varies by class — check your class Discord or Grandis Library for class-specific Hexa build guides. Fragment costs are approximate based on community data.
+  </div>
+</div>
+
+<script>
+// Fragment costs per level range (cumulative to max)
+const ORIGIN_COSTS = [0,100,150,200,260,330,410,500,600,700,820,960,1100,1260,1420,1600,1800,2000,2200,2450,2700,2980,3280,3600,3950,4310,4690,5090,5510,5960];
+const MASTERY_COSTS = [0,50,80,120,170,230,300,380,470,570,680];
+const ENHANCE_COSTS = [0,30,50,80,120,170];
+const COMMON_COSTS = [0,30,50,80,120,170];
+
+function fragCostRange(costs, from, to) {
+  to = Math.min(to, costs.length - 1);
+  return Math.max(0, costs[to] - costs[from]);
+}
+
+function generate() {
+  const role = document.getElementById('role').value;
+  const frags = +document.getElementById('frags').value || 0;
+  const originLv = Math.min(+document.getElementById('originLv').value || 0, 29);
+  const masteryLv = Math.min(+document.getElementById('masteryLv').value || 0, 9);
+
+  // Priority definitions by role
+  const priorities = {
+    boss: [
+      { name: "Origin Skill (6th Job)", type: "origin", desc: "Your core 6th job burst skill. Maxing this is your #1 priority for bossing DPS. Adds massive final damage multiplier every burst cycle.", from: originLv, to: 30, costs: ORIGIN_COSTS },
+      { name: "Mastery Core — Main Attack", type: "mastery", desc: "Enhances your primary 5th job skill used most in bossing rotation. Direct DPS increase every level.", from: masteryLv, to: 10, costs: MASTERY_COSTS },
+      { name: "Mastery Core — Burst Skill", type: "mastery", desc: "Your main burst/buff skill. Level this after your primary attack Mastery Core for maximum boss clear speed.", from: 0, to: 10, costs: MASTERY_COSTS },
+      { name: "Enhancement Core — Primary Skills", type: "enhance", desc: "Boosts your most-used 4th job skills that carry your DPS rotation. More impactful than it looks at higher levels.", from: 0, to: 5, costs: ENHANCE_COSTS },
+      { name: "Common Skill — Decent Combat Orders", type: "common", desc: "Hexa Common Skill. DCO gives +1 to all skill levels — useful boost but lower priority than class-specific skills.", from: 0, to: 5, costs: COMMON_COSTS },
+      { name: "Mastery Core — Summon/Passive", type: "mastery", desc: "Third Mastery Core target. Summons and passive-style skills that contribute to sustained DPS.", from: 0, to: 10, costs: MASTERY_COSTS },
+    ],
+    mob: [
+      { name: "Origin Skill (6th Job)", type: "origin", desc: "Even for mobbing, Origin provides raw damage and cooldown reduction on core skills. Still your first investment.", from: originLv, to: 30, costs: ORIGIN_COSTS },
+      { name: "Mastery Core — Mobbing Skill", type: "mastery", desc: "Your widest AoE attack Mastery Core. Directly reduces map clear speed — highest mobbing priority.", from: masteryLv, to: 10, costs: MASTERY_COSTS },
+      { name: "Enhancement Core — AoE Skills", type: "enhance", desc: "Boosts your primary 4th job AoE skills used for farming. Efficient cost per level for mobbing gain.", from: 0, to: 5, costs: ENHANCE_COSTS },
+      { name: "Mastery Core — Secondary AoE", type: "mastery", desc: "Second mobbing skill Mastery Core. Reduces cooldown on your secondary farming skill.", from: 0, to: 10, costs: MASTERY_COSTS },
+      { name: "Common Skill — Decent Speed Infusion", type: "common", desc: "Hexa Decent SI provides attack speed buff — very impactful for farming classes with fast skill animations.", from: 0, to: 5, costs: COMMON_COSTS },
+      { name: "Mastery Core — Utility/Buff", type: "mastery", desc: "Buff skill Mastery Core. Lower farming priority but still contributes to sustained clear rates over long sessions.", from: 0, to: 10, costs: MASTERY_COSTS },
+    ],
+    support: [
+      { name: "Common Skill — Decent Blessing", type: "common", desc: "Hexa Decent Holy Symbol or Blessing equivalent. Party buff is your main contribution — level this first.", from: 0, to: 5, costs: COMMON_COSTS },
+      { name: "Origin Skill (6th Job)", type: "origin", desc: "Even supports have Origin skills. Reduces cooldown on your main party buff cycle.", from: originLv, to: 30, costs: ORIGIN_COSTS },
+      { name: "Mastery Core — Party Buff Skill", type: "mastery", desc: "Enhances your primary party support skill (e.g. Angel Ray, Healing Barrage). Increases party value.", from: masteryLv, to: 10, costs: MASTERY_COSTS },
+      { name: "Enhancement Core — Main Support Skills", type: "enhance", desc: "Boosts the 4th job support skills your party depends on most. Good value for party-focused play.", from: 0, to: 5, costs: ENHANCE_COSTS },
+      { name: "Mastery Core — Self DPS", type: "mastery", desc: "Self DPS skill Mastery Core. Lower priority than support skills but helps your own contribution in smaller parties.", from: 0, to: 10, costs: MASTERY_COSTS },
+      { name: "Common Skill — Combat Orders", type: "common", desc: "Hexa DCO. Useful party-wide +1 skill levels. Nice to have but not your primary focus.", from: 0, to: 5, costs: COMMON_COSTS },
+    ],
+    mule: [
+      { name: "Origin Skill (6th Job)", type: "origin", desc: "For a mule, get Origin to at least Lv.1 to unlock it — this alone boosts boss clear speed significantly.", from: originLv, to: 5, costs: ORIGIN_COSTS },
+      { name: "Mastery Core — Main Bossing Skill", type: "mastery", desc: "One Mastery Core to Lv.5 is the standard mule investment. Best bang-for-buck DPS for weekly clears.", from: masteryLv, to: 5, costs: MASTERY_COSTS },
+      { name: "Enhancement Core — Key Skills", type: "enhance", desc: "One Enhancement Core is cheap and effective for mules. Boosts the skills you use every clear.", from: 0, to: 3, costs: ENHANCE_COSTS },
+    ]
+  };
+
+  const list = priorities[role];
+  const typeLabels = { origin: "Origin Skill", mastery: "Mastery Core", enhance: "Enhancement Core", common: "Common Hexa Skill" };
+
+  let totalFragsNeeded = 0;
+  let html = '';
+
+  list.forEach((skill, i) => {
+    const cost = fragCostRange(skill.costs, skill.from, skill.to);
+    const maxLv = skill.to;
+    totalFragsNeeded += cost;
+    const canAfford = frags >= totalFragsNeeded;
+    const tierClass = `tier-${Math.min(i+1, 5)}`;
+    html += `
+      <div class="skill-card ${tierClass}">
+        <div class="rank-badge">${i+1}</div>
+        <div class="skill-info">
+          <div class="skill-name">${skill.name}</div>
+          <div class="skill-type ${skill.type}">${typeLabels[skill.type]}</div>
+          <div class="skill-desc">${skill.desc}</div>
+          <div class="level-input">
+            <label>Current Lv: ${skill.from} → Target: ${maxLv}</label>
+          </div>
+        </div>
+        <div>
+          <div class="frag-cost">${cost.toLocaleString()}</div>
+          <div class="frag-label">fragments</div>
+          ${frags > 0 ? `<div style="margin-top:4px;font-size:10px;color:${canAfford ? 'var(--cyan)' : 'var(--orange)'};">${canAfford ? '✓ Affordable' : '⚠ Need more'}</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  const weeksEst = Math.ceil(Math.max(0, totalFragsNeeded - frags) / 700);
+
+  document.getElementById('sumFrags').textContent = Math.max(0, totalFragsNeeded - frags).toLocaleString();
+  document.getElementById('sumLevels').textContent = list.length;
+  document.getElementById('sumWeeks').textContent = weeksEst || '—';
+  document.getElementById('skillList').innerHTML = html;
+  document.getElementById('results').style.display = 'block';
+}
+</script>
+</body>
+</html>

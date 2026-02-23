@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MapleCalc — MapleStory Calculator Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a14;--card:#12121f;--border:#1e1e35;--orange:#ff6b35;--gold:#ffd166;--cyan:#06d6a0;--red:#ef233c;--text:#e8e8f0;--muted:#6b6b8a;--input-bg:#0d0d1a;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;}
+  .hero{background:linear-gradient(160deg,#0f0f20 0%,#1a0800 60%,#0a0a14 100%);padding:48px 24px 40px;text-align:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+  .hero::before{content:'🍄';position:absolute;font-size:200px;opacity:0.04;top:-20px;left:50%;transform:translateX(-50%);}
+  .logo{font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;color:var(--orange);letter-spacing:4px;margin-bottom:8px;}
+  .logo span{color:var(--gold);}
+  .tagline{color:var(--muted);font-size:15px;max-width:400px;margin:0 auto 16px;}
+  .version{display:inline-block;background:rgba(255,107,53,0.15);border:1px solid rgba(255,107,53,0.3);color:var(--orange);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
+  .container{max-width:900px;margin:0 auto;padding:40px 20px;}
+  .section-label{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;text-align:center;}
+  .calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:48px;}
+  .calc-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-decoration:none;color:inherit;display:block;transition:all .25s;position:relative;overflow:hidden;}
+  .calc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+  .calc-card.cp::before{background:linear-gradient(90deg,var(--cyan),#00b4d8);}
+  .calc-card.hexa::before{background:linear-gradient(90deg,#b47fff,#7c3aed);}
+  .calc-card.dmg::before{background:linear-gradient(90deg,var(--gold),#f59e0b);}
+  .calc-card.crystal::before{background:linear-gradient(90deg,#4ade80,#16a34a);}
+  .calc-card.sf::before{background:linear-gradient(90deg,#60a5fa,#2563eb);}
+  .calc-card.legion::before{background:linear-gradient(90deg,var(--orange),#c2410c);}
+  .calc-card:hover{transform:translateY(-3px);border-color:rgba(255,107,53,0.3);box-shadow:0 12px 40px rgba(0,0,0,0.4);}
+  .calc-icon{font-size:36px;margin-bottom:12px;display:block;}
+  .calc-name{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
+  .calc-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+  .calc-tag{display:inline-block;margin-top:12px;font-size:10px;font-weight:600;letter-spacing:1px;padding:3px 8px;border-radius:4px;text-transform:uppercase;}
+  .tag-essential{background:rgba(239,35,60,0.15);color:var(--red);border:1px solid rgba(239,35,60,0.3);}
+  .tag-endgame{background:rgba(255,209,102,0.12);color:var(--gold);border:1px solid rgba(255,209,102,0.25);}
+  .tag-weekly{background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);}
+  .tag-gear{background:rgba(96,165,250,0.12);color:#60a5fa;border:1px solid rgba(96,165,250,0.25);}
+  .how-to{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;margin-top:20px;}
+  .how-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--gold);margin-bottom:16px;}
+  .step{display:flex;gap:16px;margin-bottom:16px;align-items:flex-start;}
+  .step:last-child{margin-bottom:0;}
+  .step-num{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--orange);min-width:28px;}
+  .step-text{font-size:13px;color:var(--muted);line-height:1.6;}
+  .step-text strong{color:var(--text);}
+  footer{text-align:center;padding:32px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="logo">Maple<span>Calc</span></div>
+  <div class="tagline">Complete MapleStory calculator suite — damage ranges, Star Force costs, Legion optimization, and more.</div>
+  <div class="version">GMS Compatible · v257 Tallahart</div>
+</div>
+
+<div class="container">
+  <div class="section-label">Choose a Calculator</div>
+  <div class="calc-grid">
+    <a href="calc_combat_power.html" class="calc-card cp">
+      <span class="calc-icon">⚔️</span>
+      <div class="calc-name">Combat Power Estimator</div>
+      <div class="calc-desc">Estimate your character's Combat Power from stats, boss damage, final damage, IED, and more. See your tier ranking.</div>
+      <span class="calc-tag tag-essential">Essential</span>
+    </a>
+    <a href="calc_hexa_matrix.html" class="calc-card hexa">
+      <span class="calc-icon">💠</span>
+      <div class="calc-name">Hexa Matrix Priority</div>
+      <div class="calc-desc">Find the optimal Hexa skill upgrade order for your role. Shows fragment costs, affordability, and estimated weeks to complete.</div>
+      <span class="calc-tag tag-endgame">6th Job</span>
+    </a>
+    <a href="calc_damage_range.html" class="calc-card dmg">
+      <span class="calc-icon">📊</span>
+      <div class="calc-name">Damage Range Calculator</div>
+      <div class="calc-desc">Calculate your min/max damage per hit and check boss readiness across the full progression list from Zakum to Hard Kaling.</div>
+      <span class="calc-tag tag-essential">Essential</span>
+    </a>
+    <a href="calc_boss_crystal.html" class="calc-card crystal">
+      <span class="calc-icon">💎</span>
+      <div class="calc-name">Boss Crystal Income</div>
+      <div class="calc-desc">Track weekly meso income from boss crystals across all characters. Supports Reboot/Heroic (5×) multiplier. Tracks 12-crystal limit.</div>
+      <span class="calc-tag tag-weekly">Weekly</span>
+    </a>
+    <a href="calc_starforce.html" class="calc-card sf">
+      <span class="calc-icon">⭐</span>
+      <div class="calc-name">Star Force Simulator</div>
+      <div class="calc-desc">Monte Carlo simulation (10,000 runs) for expected Star Force meso cost, destruction count, and per-star probability breakdown.</div>
+      <span class="calc-tag tag-gear">Gear</span>
+    </a>
+    <a href="calc_legion.html" class="calc-card legion">
+      <span class="calc-icon">🏆</span>
+      <div class="calc-name">Legion Optimizer</div>
+      <div class="calc-desc">Track your Legion rank, select your characters, and get recommended grid layouts with all active stat bonuses calculated.</div>
+      <span class="calc-tag tag-essential">Essential</span>
+    </a>
+  </div>
+
+  <div class="how-to">
+    <div class="how-title">🔧 How to Embed in Glide</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Host these files for free</strong> on GitHub Pages or Netlify. Upload all HTML files to a GitHub repo, enable Pages in Settings, and your URL will be <code>yourusername.github.io/maplecalc</code>.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>In your Glide app</strong>, add a new tab or screen. Choose "Web Embed" or "Link" component. Paste the full URL of each calculator HTML file.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Each calculator loads as a native webview</strong> inside your app. Users stay in the app — no external browser redirect. Works on iOS Safari and all modern browsers.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><strong>To update a calculator</strong>, just edit the HTML file and push to GitHub. Changes go live automatically within minutes, no app store update needed.</div></div>
+  </div>
+</div>
+
+<footer>MapleCalc is a fan-made tool and is not affiliated with Nexon or MapleStory. All game data sourced from community resources.<br>Built for the MapleStory community 🍄</footer>
+</body>
+</html>

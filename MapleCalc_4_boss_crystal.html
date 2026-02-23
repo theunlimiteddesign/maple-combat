@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boss Crystal Income — MapleCalc</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a14;--card:#12121f;--border:#1e1e35;--orange:#ff6b35;--gold:#ffd166;--cyan:#06d6a0;--red:#ef233c;--green:#4ade80;--text:#e8e8f0;--muted:#6b6b8a;--input-bg:#0d0d1a;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;background-image:radial-gradient(ellipse at 50% 0%,rgba(74,222,128,0.05) 0%,transparent 50%);}
+  header{background:linear-gradient(135deg,#0f0f20,#0a1a0d);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;gap:14px;}
+  .logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--orange);letter-spacing:2px;}
+  .logo span{color:var(--gold);}
+  .badge{background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:var(--green);font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
+  .container{max-width:760px;margin:0 auto;padding:28px 20px;}
+  h1{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;}
+  .mode-toggle{display:flex;gap:8px;margin-bottom:20px;}
+  .mode-btn{flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+  .mode-btn.active{border-color:var(--green);color:var(--green);background:rgba(74,222,128,0.08);}
+  .section{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+  .section-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--green);letter-spacing:2px;text-transform:uppercase;padding:14px 20px 0;display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+  .boss-row{display:grid;grid-template-columns:1fr auto auto auto;gap:0;align-items:center;padding:10px 20px;border-bottom:1px solid rgba(30,30,53,0.6);transition:background .15s;}
+  .boss-row:last-child{border-bottom:none;}
+  .boss-row:hover{background:rgba(255,255,255,0.02);}
+  .boss-name{font-size:13px;font-weight:500;}
+  .boss-difficulty{font-size:11px;color:var(--muted);margin-top:2px;}
+  .crystal-val{font-family:'Rajdhani',sans-serif;font-size:14px;color:var(--muted);text-align:right;width:90px;}
+  .chars-input{display:flex;align-items:center;gap:6px;width:80px;justify-content:center;}
+  .chars-input input{width:44px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:13px;padding:5px;text-align:center;outline:none;}
+  .chars-input label{font-size:10px;color:var(--muted);}
+  .check-col{width:36px;text-align:center;}
+  .check-col input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);cursor:pointer;}
+  .summary{background:linear-gradient(135deg,#0a1a0d,#0a0a14);border:1px solid rgba(74,222,128,0.3);border-radius:12px;padding:24px;margin:20px 0;}
+  .sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center;margin-bottom:16px;}
+  .sum-val{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--green);}
+  .sum-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+  .crystals-left{display:flex;gap:8px;align-items:center;justify-content:center;padding-top:16px;border-top:1px solid var(--border);}
+  .crystal-bar{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .crystal-fill{height:100%;border-radius:4px;transition:width .5s;background:linear-gradient(90deg,var(--green),var(--cyan));}
+  .crystal-bar.over .crystal-fill{background:linear-gradient(90deg,var(--gold),var(--orange));}
+  .crystal-bar.capped .crystal-fill{background:linear-gradient(90deg,var(--red),var(--orange));}
+  .crystal-text{font-size:12px;color:var(--muted);white-space:nowrap;}
+  .reboot-mult{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .reboot-mult label{font-size:13px;color:var(--text);}
+  .reboot-mult .mult{font-family:'Rajdhani',sans-serif;font-size:18px;color:var(--orange);font-weight:700;}
+  .btn{width:100%;background:linear-gradient(135deg,var(--green),#16a34a);border:none;border-radius:10px;color:#0a0a14;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;padding:14px;cursor:pointer;transition:transform .15s,box-shadow .15s;text-transform:uppercase;}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(74,222,128,0.4);}
+  .note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;padding:10px;background:rgba(255,255,255,0.02);border-radius:6px;border-left:3px solid var(--border);}
+  .reboot-tag{font-size:10px;background:rgba(255,107,53,0.2);color:var(--orange);padding:2px 6px;border-radius:4px;font-weight:600;}
+  .diff-easy{color:#4ade80;} .diff-normal{color:#60a5fa;} .diff-hard{color:#f97316;} .diff-chaos{color:#c084fc;} .diff-extreme{color:var(--gold);}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Maple<span>Calc</span></div>
+  <div class="badge">Crystal Income</div>
+</header>
+<div class="container">
+  <h1>💎 Boss Crystal Income Calculator</h1>
+  <p class="subtitle">Track your weekly boss crystal income across all characters. Checks against the 12 weekly crystal limit per character.</p>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btnRegular" onclick="setMode('regular')">Regular World</button>
+    <button class="mode-btn" id="btnReboot" onclick="setMode('reboot')">Reboot / Heroic World <span class="reboot-tag">×5</span></button>
+  </div>
+
+  <div id="rebootNote" style="display:none" class="reboot-mult">
+    <label>🔥 Reboot/Heroic World multiplier active</label>
+    <div class="mult">×5 Meso</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Daily Bosses <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">— Enter number of characters you clear on</span></div>
+    <div id="dailyBosses"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Weekly Bosses <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">— 12 weekly crystal limit per character applies</span></div>
+    <div id="weeklyBosses"></div>
+  </div>
+
+  <button class="btn" onclick="calcIncome()">CALCULATE WEEKLY INCOME</button>
+
+  <div class="summary" id="summary" style="display:none">
+    <div class="sum-grid">
+      <div><div class="sum-val" id="totalMeso">0</div><div class="sum-label">Weekly Mesos</div></div>
+      <div><div class="sum-val" id="totalCrystals">0</div><div class="sum-label">Crystals Used</div></div>
+      <div><div class="sum-val" id="monthlyMeso">0</div><div class="sum-label">Monthly Est.</div></div>
+    </div>
+    <div class="crystals-left">
+      <div class="crystal-text" id="crystalLeft">0 / 12 crystals per char</div>
+      <div class="crystal-bar" id="crystalBarEl"><div class="crystal-fill" id="crystalFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="note">ℹ️ Crystal values are approximate GMS regular world prices. Reboot/Heroic World values are 5× base. Weekly limit is 12 crystals per character (post-July 2024 patch). Daily bosses reset daily but sell as daily crystals with no weekly limit cap beyond total character count.</div>
+</div>
+
+<script>
+let mode = 'regular';
+
+const DAILY_BOSSES = [
+  {name:"Zakum", diff:"Normal",    val:3900000,  diffClass:"diff-normal"},
+  {name:"Zakum", diff:"Chaos",     val:15600000, diffClass:"diff-chaos"},
+  {name:"Hilla",  diff:"Normal",   val:3900000,  diffClass:"diff-normal"},
+  {name:"Hilla",  diff:"Hard",     val:15600000, diffClass:"diff-hard"},
+  {name:"Horntail", diff:"Normal", val:3900000,  diffClass:"diff-normal"},
+  {name:"Horntail", diff:"Chaos",  val:15600000, diffClass:"diff-chaos"},
+  {name:"Ranmaru", diff:"Normal",  val:3900000,  diffClass:"diff-normal"},
+];
+
+const WEEKLY_BOSSES = [
+  {name:"Von Leon",     diff:"Hard",    val:15600000,  diffClass:"diff-hard"},
+  {name:"Pink Bean",    diff:"Chaos",   val:23400000,  diffClass:"diff-chaos"},
+  {name:"Arkarium",     diff:"Chaos",   val:23400000,  diffClass:"diff-chaos"},
+  {name:"Papulatus",    diff:"Chaos",   val:23400000,  diffClass:"diff-chaos"},
+  {name:"Magnus",       diff:"Hard",    val:46800000,  diffClass:"diff-hard"},
+  {name:"Gollux",       diff:"Hell",    val:23400000,  diffClass:"diff-chaos"},
+  {name:"Lotus",        diff:"Normal",  val:46800000,  diffClass:"diff-normal"},
+  {name:"Lotus",        diff:"Hard",    val:109200000, diffClass:"diff-hard"},
+  {name:"Damien",       diff:"Normal",  val:54600000,  diffClass:"diff-normal"},
+  {name:"Damien",       diff:"Hard",    val:109200000, diffClass:"diff-hard"},
+  {name:"Guardian Angel Slime", diff:"Normal", val:54600000, diffClass:"diff-normal"},
+  {name:"Guardian Angel Slime", diff:"Chaos",  val:109200000, diffClass:"diff-chaos"},
+  {name:"Lucid",        diff:"Normal",  val:78000000,  diffClass:"diff-normal"},
+  {name:"Lucid",        diff:"Hard",    val:156000000, diffClass:"diff-hard"},
+  {name:"Will",         diff:"Normal",  val:78000000,  diffClass:"diff-normal"},
+  {name:"Will",         diff:"Hard",    val:156000000, diffClass:"diff-hard"},
+  {name:"Gloom",        diff:"Normal",  val:109200000, diffClass:"diff-normal"},
+  {name:"Gloom",        diff:"Chaos",   val:156000000, diffClass:"diff-chaos"},
+  {name:"Darknell",     diff:"Normal",  val:109200000, diffClass:"diff-normal"},
+  {name:"Darknell",     diff:"Hard",    val:203100000, diffClass:"diff-hard"},
+  {name:"Seren",        diff:"Normal",  val:156000000, diffClass:"diff-normal"},
+  {name:"Seren",        diff:"Hard",    val:281250000, diffClass:"diff-hard"},
+  {name:"Kalos",        diff:"Normal",  val:203100000, diffClass:"diff-normal"},
+  {name:"Kalos",        diff:"Hard",    val:468750000, diffClass:"diff-hard"},
+  {name:"Kalos",        diff:"Extreme", val:750000000, diffClass:"diff-extreme"},
+  {name:"Kaling",       diff:"Normal",  val:203100000, diffClass:"diff-normal"},
+  {name:"Kaling",       diff:"Hard",    val:468750000, diffClass:"diff-hard"},
+  {name:"Kaling",       diff:"Extreme", val:750000000, diffClass:"diff-extreme"},
+];
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnRegular').classList.toggle('active', m === 'regular');
+  document.getElementById('btnReboot').classList.toggle('active', m === 'reboot');
+  document.getElementById('rebootNote').style.display = m === 'reboot' ? 'flex' : 'none';
+}
+
+function fmtM(n) { if(n>=1e9) return (n/1e9).toFixed(2)+'B'; if(n>=1e6) return (n/1e6).toFixed(0)+'M'; return (n/1e3).toFixed(0)+'K'; }
+
+function buildRows(list, containerId) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  list.forEach((b, i) => {
+    const row = document.createElement('div');
+    row.className = 'boss-row';
+    row.innerHTML = `
+      <div>
+        <div class="boss-name">${b.name}</div>
+        <div class="boss-difficulty ${b.diffClass}">${b.diff}</div>
+      </div>
+      <div class="crystal-val">${fmtM(b.val)}</div>
+      <div class="chars-input">
+        <input type="number" id="chars_${containerId}_${i}" min="0" max="50" value="0" placeholder="0">
+        <label>chars</label>
+      </div>
+      <div class="check-col"><input type="checkbox" id="chk_${containerId}_${i}" onchange="syncCheck('${containerId}',${i})"></div>
+    `;
+    c.appendChild(row);
+  });
+}
+
+function syncCheck(cid, i) {
+  const chk = document.getElementById(`chk_${cid}_${i}`);
+  const inp = document.getElementById(`chars_${cid}_${i}`);
+  if (chk.checked && +inp.value === 0) inp.value = 1;
+  if (!chk.checked) inp.value = 0;
+}
+
+function calcIncome() {
+  const mult = mode === 'reboot' ? 5 : 1;
+  let total = 0, crystalCount = 0;
+
+  DAILY_BOSSES.forEach((b, i) => {
+    const chars = +document.getElementById(`chars_dailyBosses_${i}`).value || 0;
+    total += b.val * chars * mult;
+  });
+
+  WEEKLY_BOSSES.forEach((b, i) => {
+    const chars = +document.getElementById(`chars_weeklyBosses_${i}`).value || 0;
+    total += b.val * chars * mult;
+    crystalCount += chars;
+  });
+
+  const maxCrystals = 12;
+  const pct = Math.min(crystalCount / maxCrystals * 100, 100);
+  const over = crystalCount > maxCrystals;
+
+  document.getElementById('totalMeso').textContent = fmtM(total);
+  document.getElementById('totalCrystals').textContent = crystalCount;
+  document.getElementById('monthlyMeso').textContent = fmtM(total * 4);
+  document.getElementById('crystalLeft').textContent = `${crystalCount} / ${maxCrystals} weekly crystals per char`;
+
+  const bar = document.getElementById('crystalBarEl');
+  bar.className = 'crystal-bar' + (over ? ' over' : crystalCount >= maxCrystals ? ' capped' : '');
+  document.getElementById('crystalFill').style.width = pct + '%';
+
+  document.getElementById('summary').style.display = 'block';
+}
+
+buildRows(DAILY_BOSSES, 'dailyBosses');
+buildRows(WEEKLY_BOSSES, 'weeklyBosses');
+</script>
+</body>
+</html>
